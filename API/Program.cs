@@ -1,5 +1,11 @@
+using System.Text;
 using API.Data;
+using API.Extensions;
+using API.Interfaces;
+using API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var _myAllowOrigins = "capp";
 
@@ -13,22 +19,16 @@ builder.Services.AddCors(x => {
         //p.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod();
     });
 });
-// builder.Services.AddCors(options => {
-//     options.AddDefaultPolicy(policy => {
-//         policy.WithOrigins("http://localhost:4200");
-//     });
-// });
-// builder.Services.AddCors(options => {
-//     options.AddPolicy("capp", builder => builder.WithOrigins("*"));    
-// });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<DataContext>(options => {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+builder.Services.AddApplicationServices(builder.Configuration);
+//builder.Services.AddScoped<ITokenService, TokenService>();
+// builder.Services.AddDbContext<DataContext>(options => {
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+// });
 
 
 
@@ -48,6 +48,7 @@ app.UseRouting();
 app.UseCors(_myAllowOrigins);
 //app.UseCors();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
